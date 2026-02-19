@@ -1,0 +1,608 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		64193CC82F3B9C7F800ECB7B /* MarkedSalePointDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C680A320BD26FB97373948F0 /* MarkedSalePointDetailSheet.swift */; };
+		A1B2C3D4E5F6000000000100 /* SwiftMobileIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000010 /* SwiftMobileIOSApp.swift */; };
+		A1B2C3D4E5F6000000000101 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000011 /* AppState.swift */; };
+		A1B2C3D4E5F6000000000102 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000012 /* AppConfig.swift */; };
+		A1B2C3D4E5F6000000000103 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000013 /* APIError.swift */; };
+		A1B2C3D4E5F6000000000104 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000014 /* APIClient.swift */; };
+		A1B2C3D4E5F6000000000105 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000015 /* HTTPMethod.swift */; };
+		A1B2C3D4E5F6000000000106 /* SessionCookieStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000016 /* SessionCookieStore.swift */; };
+		A1B2C3D4E5F6000000000107 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000017 /* Endpoint.swift */; };
+		A1B2C3D4E5F6000000000108 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000018 /* AuthModels.swift */; };
+		A1B2C3D4E5F6000000000109 /* DeliveryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000019 /* DeliveryModels.swift */; };
+		A1B2C3D4E5F600000000010A /* ProductModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000001A /* ProductModels.swift */; };
+		A1B2C3D4E5F600000000010B /* MapModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000001B /* MapModels.swift */; };
+		A1B2C3D4E5F600000000010C /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000001C /* AuthService.swift */; };
+		A1B2C3D4E5F600000000010D /* DealerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000001D /* DealerService.swift */; };
+		A1B2C3D4E5F600000000010E /* AdminService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000001E /* AdminService.swift */; };
+		A1B2C3D4E5F600000000010F /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000001F /* LoginViewModel.swift */; };
+		A1B2C3D4E5F6000000000110 /* DeliveriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000020 /* DeliveriesViewModel.swift */; };
+		A1B2C3D4E5F6000000000111 /* DeliveryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000021 /* DeliveryDetailViewModel.swift */; };
+		A1B2C3D4E5F6000000000112 /* DeliveryItemEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000022 /* DeliveryItemEditViewModel.swift */; };
+		A1B2C3D4E5F6000000000113 /* ProductSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000023 /* ProductSearchViewModel.swift */; };
+		A1B2C3D4E5F6000000000114 /* MarkPointViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000024 /* MarkPointViewModel.swift */; };
+		A1B2C3D4E5F6000000000115 /* AdminMarkedPointsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000025 /* AdminMarkedPointsViewModel.swift */; };
+		A1B2C3D4E5F6000000000116 /* AdminUsersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000026 /* AdminUsersViewModel.swift */; };
+		A1B2C3D4E5F6000000000117 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000027 /* RootView.swift */; };
+		A1B2C3D4E5F6000000000118 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000028 /* MainTabView.swift */; };
+		A1B2C3D4E5F6000000000119 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000029 /* LoginView.swift */; };
+		A1B2C3D4E5F600000000011A /* DeliveriesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000002A /* DeliveriesListView.swift */; };
+		A1B2C3D4E5F600000000011B /* DeliveryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000002B /* DeliveryDetailView.swift */; };
+		A1B2C3D4E5F600000000011C /* DeliveryItemEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000002C /* DeliveryItemEditView.swift */; };
+		A1B2C3D4E5F600000000011D /* ProductSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000002D /* ProductSearchView.swift */; };
+		A1B2C3D4E5F600000000011E /* MarkNewSalePointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000002E /* MarkNewSalePointView.swift */; };
+		A1B2C3D4E5F600000000011F /* AdminHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000002F /* AdminHomeView.swift */; };
+		A1B2C3D4E5F6000000000120 /* AdminMarkedPointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000030 /* AdminMarkedPointsView.swift */; };
+		A1B2C3D4E5F6000000000121 /* AdminUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000031 /* AdminUsersView.swift */; };
+		A1B2C3D4E5F6000000000122 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000032 /* Assets.xcassets */; };
+		A1B2C3D4E5F6000000000123 /* RegisterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000033 /* RegisterViewModel.swift */; };
+		A1B2C3D4E5F6000000000124 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000034 /* RegisterView.swift */; };
+		A1B2C3D4E5F6000000000125 /* TrackModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000035 /* TrackModels.swift */; };
+		A1B2C3D4E5F6000000000126 /* TrackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000036 /* TrackService.swift */; };
+		A1B2C3D4E5F6000000000127 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000037 /* LocationService.swift */; };
+		A1B2C3D4E5F6000000000128 /* TracksListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000038 /* TracksListViewModel.swift */; };
+		A1B2C3D4E5F6000000000129 /* CreateTrackViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000039 /* CreateTrackViewModel.swift */; };
+		A1B2C3D4E5F600000000012A /* GPSRecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000003A /* GPSRecordingViewModel.swift */; };
+		A1B2C3D4E5F600000000012B /* AddSalePointViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000003B /* AddSalePointViewModel.swift */; };
+		A1B2C3D4E5F600000000012C /* TrackDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000003C /* TrackDetailViewModel.swift */; };
+		A1B2C3D4E5F600000000012D /* TracksListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000003D /* TracksListView.swift */; };
+		A1B2C3D4E5F600000000012E /* CreateTrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000003E /* CreateTrackView.swift */; };
+		A1B2C3D4E5F600000000012F /* GPSRecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000003F /* GPSRecordingView.swift */; };
+		A1B2C3D4E5F6000000000130 /* AddSalePointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000040 /* AddSalePointView.swift */; };
+		A1B2C3D4E5F6000000000131 /* TrackDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000041 /* TrackDetailView.swift */; };
+		A1B2C3D4E5F6000000000140 /* OfflineSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000050 /* OfflineSyncService.swift */; };
+		A1B2C3D4E5F6000000000141 /* RecordingNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000051 /* RecordingNotificationService.swift */; };
+		A1B2C3D4E5F6000000000142 /* CaleiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000052 /* CaleiTheme.swift */; };
+		A1B2C3D4E5F6000000000143 /* ViewHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000053 /* ViewHelpers.swift */; };
+		A1B2C3D4E5F6000000000144 /* SalePointDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000054 /* SalePointDetailSheet.swift */; };
+		A1B2C3D4E5F6000000000150 /* ZoneModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000060 /* ZoneModels.swift */; };
+		A1B2C3D4E5F6000000000151 /* ZonesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000061 /* ZonesService.swift */; };
+		A1B2C3D4E5F6000000000152 /* ZonesManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000062 /* ZonesManagementViewModel.swift */; };
+		A1B2C3D4E5F6000000000153 /* ZonesManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000063 /* ZonesManagementView.swift */; };
+		A1B2C3D4E5F6000000000154 /* ZoneEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000064 /* ZoneEditorSheet.swift */; };
+		A1B2C3D4E5F6000000000155 /* ZoneDrawingMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000065 /* ZoneDrawingMapView.swift */; };
+		A1B2C3D4E5F6000000000160 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000070 /* HomeView.swift */; };
+		A1B2C3D4E5F6000000000161 /* SideMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000071 /* SideMenuView.swift */; };
+		A1B2C3D4E5F6000000000162 /* PermissionsOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000072 /* PermissionsOnboardingView.swift */; };
+		A3A115100F88ED9ADA6F2334 /* ZoneSalePointDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CAF24617B38F88C2E9C861 /* ZoneSalePointDetailSheet.swift */; };
+		AD593984CB85B19D112D6828 /* ZoneDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC73726FB4DF7B3EF46AF3E9 /* ZoneDetailView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		95CAF24617B38F88C2E9C861 /* ZoneSalePointDetailSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ZoneSalePointDetailSheet.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000000E /* SwiftMobileIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = SwiftMobileIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F600000000000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000010 /* SwiftMobileIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMobileIOSApp.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000011 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000012 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000013 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000014 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000015 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000016 /* SessionCookieStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCookieStore.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000017 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000018 /* AuthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModels.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000019 /* DeliveryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryModels.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000001A /* ProductModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductModels.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000001B /* MapModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapModels.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000001C /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000001D /* DealerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealerService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000001E /* AdminService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000001F /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000020 /* DeliveriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveriesViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000021 /* DeliveryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryDetailViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000022 /* DeliveryItemEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryItemEditViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000023 /* ProductSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSearchViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000024 /* MarkPointViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkPointViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000025 /* AdminMarkedPointsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminMarkedPointsViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000026 /* AdminUsersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminUsersViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000027 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000028 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000029 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000002A /* DeliveriesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveriesListView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000002B /* DeliveryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryDetailView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000002C /* DeliveryItemEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryItemEditView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000002D /* ProductSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSearchView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000002E /* MarkNewSalePointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkNewSalePointView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000002F /* AdminHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminHomeView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000030 /* AdminMarkedPointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminMarkedPointsView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000031 /* AdminUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminUsersView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000033 /* RegisterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000034 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000035 /* TrackModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackModels.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000036 /* TrackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000037 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000038 /* TracksListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksListViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000039 /* CreateTrackViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTrackViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000003A /* GPSRecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSRecordingViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000003B /* AddSalePointViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSalePointViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000003C /* TrackDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDetailViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000003D /* TracksListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksListView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000003E /* CreateTrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTrackView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000003F /* GPSRecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSRecordingView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000040 /* AddSalePointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSalePointView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000041 /* TrackDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDetailView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000050 /* OfflineSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineSyncService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000051 /* RecordingNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingNotificationService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000052 /* CaleiTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaleiTheme.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000053 /* ViewHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewHelpers.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000054 /* SalePointDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SalePointDetailSheet.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000060 /* ZoneModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneModels.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000061 /* ZonesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZonesService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000062 /* ZonesManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZonesManagementViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000063 /* ZonesManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZonesManagementView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000064 /* ZoneEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneEditorSheet.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000065 /* ZoneDrawingMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneDrawingMapView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000070 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000071 /* SideMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000072 /* PermissionsOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsOnboardingView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000999 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		BC73726FB4DF7B3EF46AF3E9 /* ZoneDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ZoneDetailView.swift; sourceTree = "<group>"; };
+		C680A320BD26FB97373948F0 /* MarkedSalePointDetailSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MarkedSalePointDetailSheet.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1B2C3D4E5F6000000000007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1B2C3D4E5F6000000000003 = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000200 /* App */,
+				A1B2C3D4E5F6000000000201 /* Config */,
+				A1B2C3D4E5F6000000000202 /* Networking */,
+				A1B2C3D4E5F6000000000203 /* Models */,
+				A1B2C3D4E5F6000000000204 /* Services */,
+				A1B2C3D4E5F6000000000208 /* Utilities */,
+				A1B2C3D4E5F6000000000205 /* ViewModels */,
+				A1B2C3D4E5F6000000000206 /* Views */,
+				A1B2C3D4E5F6000000000032 /* Assets.xcassets */,
+				A1B2C3D4E5F600000000000F /* Info.plist */,
+				A1B2C3D4E5F6000000000999 /* LaunchScreen.storyboard */,
+				A1B2C3D4E5F6000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600000000000E /* SwiftMobileIOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000200 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000010 /* SwiftMobileIOSApp.swift */,
+				A1B2C3D4E5F6000000000011 /* AppState.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000201 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000012 /* AppConfig.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000202 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000013 /* APIError.swift */,
+				A1B2C3D4E5F6000000000014 /* APIClient.swift */,
+				A1B2C3D4E5F6000000000015 /* HTTPMethod.swift */,
+				A1B2C3D4E5F6000000000016 /* SessionCookieStore.swift */,
+				A1B2C3D4E5F6000000000017 /* Endpoint.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000203 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000018 /* AuthModels.swift */,
+				A1B2C3D4E5F6000000000019 /* DeliveryModels.swift */,
+				A1B2C3D4E5F600000000001A /* ProductModels.swift */,
+				A1B2C3D4E5F600000000001B /* MapModels.swift */,
+				A1B2C3D4E5F6000000000035 /* TrackModels.swift */,
+				A1B2C3D4E5F6000000000060 /* ZoneModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000204 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600000000001C /* AuthService.swift */,
+				A1B2C3D4E5F600000000001D /* DealerService.swift */,
+				A1B2C3D4E5F600000000001E /* AdminService.swift */,
+				A1B2C3D4E5F6000000000036 /* TrackService.swift */,
+				A1B2C3D4E5F6000000000037 /* LocationService.swift */,
+				A1B2C3D4E5F6000000000050 /* OfflineSyncService.swift */,
+				A1B2C3D4E5F6000000000051 /* RecordingNotificationService.swift */,
+				A1B2C3D4E5F6000000000061 /* ZonesService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000205 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600000000001F /* LoginViewModel.swift */,
+				A1B2C3D4E5F6000000000020 /* DeliveriesViewModel.swift */,
+				A1B2C3D4E5F6000000000021 /* DeliveryDetailViewModel.swift */,
+				A1B2C3D4E5F6000000000022 /* DeliveryItemEditViewModel.swift */,
+				A1B2C3D4E5F6000000000023 /* ProductSearchViewModel.swift */,
+				A1B2C3D4E5F6000000000024 /* MarkPointViewModel.swift */,
+				A1B2C3D4E5F6000000000025 /* AdminMarkedPointsViewModel.swift */,
+				A1B2C3D4E5F6000000000026 /* AdminUsersViewModel.swift */,
+				A1B2C3D4E5F6000000000033 /* RegisterViewModel.swift */,
+				A1B2C3D4E5F6000000000038 /* TracksListViewModel.swift */,
+				A1B2C3D4E5F6000000000039 /* CreateTrackViewModel.swift */,
+				A1B2C3D4E5F600000000003A /* GPSRecordingViewModel.swift */,
+				A1B2C3D4E5F600000000003B /* AddSalePointViewModel.swift */,
+				A1B2C3D4E5F600000000003C /* TrackDetailViewModel.swift */,
+				A1B2C3D4E5F6000000000062 /* ZonesManagementViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000206 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000027 /* RootView.swift */,
+				A1B2C3D4E5F6000000000070 /* HomeView.swift */,
+				A1B2C3D4E5F6000000000028 /* MainTabView.swift */,
+				A1B2C3D4E5F6000000000029 /* LoginView.swift */,
+				A1B2C3D4E5F600000000002A /* DeliveriesListView.swift */,
+				A1B2C3D4E5F600000000002B /* DeliveryDetailView.swift */,
+				A1B2C3D4E5F600000000002C /* DeliveryItemEditView.swift */,
+				A1B2C3D4E5F600000000002D /* ProductSearchView.swift */,
+				A1B2C3D4E5F600000000002E /* MarkNewSalePointView.swift */,
+				A1B2C3D4E5F600000000002F /* AdminHomeView.swift */,
+				A1B2C3D4E5F6000000000030 /* AdminMarkedPointsView.swift */,
+				A1B2C3D4E5F6000000000031 /* AdminUsersView.swift */,
+				A1B2C3D4E5F6000000000034 /* RegisterView.swift */,
+				A1B2C3D4E5F6000000000071 /* SideMenuView.swift */,
+				A1B2C3D4E5F6000000000072 /* PermissionsOnboardingView.swift */,
+				A1B2C3D4E5F6000000000207 /* Tracks */,
+				A1B2C3D4E5F6000000000209 /* Admin */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000207 /* Tracks */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600000000003D /* TracksListView.swift */,
+				A1B2C3D4E5F600000000003E /* CreateTrackView.swift */,
+				A1B2C3D4E5F600000000003F /* GPSRecordingView.swift */,
+				A1B2C3D4E5F6000000000040 /* AddSalePointView.swift */,
+				A1B2C3D4E5F6000000000041 /* TrackDetailView.swift */,
+				A1B2C3D4E5F6000000000054 /* SalePointDetailSheet.swift */,
+			);
+			path = Tracks;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000208 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000052 /* CaleiTheme.swift */,
+				A1B2C3D4E5F6000000000053 /* ViewHelpers.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000000000209 /* Admin */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000000000063 /* ZonesManagementView.swift */,
+				A1B2C3D4E5F6000000000064 /* ZoneEditorSheet.swift */,
+				A1B2C3D4E5F6000000000065 /* ZoneDrawingMapView.swift */,
+				C680A320BD26FB97373948F0 /* MarkedSalePointDetailSheet.swift */,
+				BC73726FB4DF7B3EF46AF3E9 /* ZoneDetailView.swift */,
+				95CAF24617B38F88C2E9C861 /* ZoneSalePointDetailSheet.swift */,
+			);
+			path = Admin;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1B2C3D4E5F6000000000002 /* SwiftMobileIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1B2C3D4E5F6000000000009 /* Build configuration list for PBXNativeTarget "SwiftMobileIOS" */;
+			buildPhases = (
+				A1B2C3D4E5F6000000000005 /* Sources */,
+				A1B2C3D4E5F6000000000007 /* Frameworks */,
+				A1B2C3D4E5F6000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiftMobileIOS;
+			productName = SwiftMobileIOS;
+			productReference = A1B2C3D4E5F600000000000E /* SwiftMobileIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1B2C3D4E5F6000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					A1B2C3D4E5F6000000000002 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = A1B2C3D4E5F6000000000008 /* Build configuration list for PBXProject "SwiftMobileIOS" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A1B2C3D4E5F6000000000003;
+			productRefGroup = A1B2C3D4E5F6000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1B2C3D4E5F6000000000002 /* SwiftMobileIOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1B2C3D4E5F6000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D4E5F6000000000122 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1B2C3D4E5F6000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D4E5F6000000000100 /* SwiftMobileIOSApp.swift in Sources */,
+				A1B2C3D4E5F6000000000101 /* AppState.swift in Sources */,
+				A1B2C3D4E5F6000000000102 /* AppConfig.swift in Sources */,
+				A1B2C3D4E5F6000000000103 /* APIError.swift in Sources */,
+				A1B2C3D4E5F6000000000104 /* APIClient.swift in Sources */,
+				A1B2C3D4E5F6000000000105 /* HTTPMethod.swift in Sources */,
+				A1B2C3D4E5F6000000000106 /* SessionCookieStore.swift in Sources */,
+				A1B2C3D4E5F6000000000107 /* Endpoint.swift in Sources */,
+				A1B2C3D4E5F6000000000108 /* AuthModels.swift in Sources */,
+				A1B2C3D4E5F6000000000109 /* DeliveryModels.swift in Sources */,
+				A1B2C3D4E5F600000000010A /* ProductModels.swift in Sources */,
+				A1B2C3D4E5F600000000010B /* MapModels.swift in Sources */,
+				A1B2C3D4E5F600000000010C /* AuthService.swift in Sources */,
+				A1B2C3D4E5F600000000010D /* DealerService.swift in Sources */,
+				A1B2C3D4E5F600000000010E /* AdminService.swift in Sources */,
+				A1B2C3D4E5F600000000010F /* LoginViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000110 /* DeliveriesViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000111 /* DeliveryDetailViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000112 /* DeliveryItemEditViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000113 /* ProductSearchViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000114 /* MarkPointViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000115 /* AdminMarkedPointsViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000116 /* AdminUsersViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000117 /* RootView.swift in Sources */,
+				A1B2C3D4E5F6000000000118 /* MainTabView.swift in Sources */,
+				A1B2C3D4E5F6000000000119 /* LoginView.swift in Sources */,
+				A1B2C3D4E5F600000000011A /* DeliveriesListView.swift in Sources */,
+				A1B2C3D4E5F600000000011B /* DeliveryDetailView.swift in Sources */,
+				A1B2C3D4E5F600000000011C /* DeliveryItemEditView.swift in Sources */,
+				A1B2C3D4E5F600000000011D /* ProductSearchView.swift in Sources */,
+				A1B2C3D4E5F600000000011E /* MarkNewSalePointView.swift in Sources */,
+				A1B2C3D4E5F600000000011F /* AdminHomeView.swift in Sources */,
+				A1B2C3D4E5F6000000000120 /* AdminMarkedPointsView.swift in Sources */,
+				A1B2C3D4E5F6000000000121 /* AdminUsersView.swift in Sources */,
+				A1B2C3D4E5F6000000000123 /* RegisterViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000124 /* RegisterView.swift in Sources */,
+				A1B2C3D4E5F6000000000125 /* TrackModels.swift in Sources */,
+				A1B2C3D4E5F6000000000126 /* TrackService.swift in Sources */,
+				A1B2C3D4E5F6000000000127 /* LocationService.swift in Sources */,
+				A1B2C3D4E5F6000000000128 /* TracksListViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000129 /* CreateTrackViewModel.swift in Sources */,
+				A1B2C3D4E5F600000000012A /* GPSRecordingViewModel.swift in Sources */,
+				A1B2C3D4E5F600000000012B /* AddSalePointViewModel.swift in Sources */,
+				A1B2C3D4E5F600000000012C /* TrackDetailViewModel.swift in Sources */,
+				A1B2C3D4E5F600000000012D /* TracksListView.swift in Sources */,
+				A1B2C3D4E5F600000000012E /* CreateTrackView.swift in Sources */,
+				A1B2C3D4E5F600000000012F /* GPSRecordingView.swift in Sources */,
+				A1B2C3D4E5F6000000000130 /* AddSalePointView.swift in Sources */,
+				A1B2C3D4E5F6000000000131 /* TrackDetailView.swift in Sources */,
+				A1B2C3D4E5F6000000000140 /* OfflineSyncService.swift in Sources */,
+				A1B2C3D4E5F6000000000141 /* RecordingNotificationService.swift in Sources */,
+				A1B2C3D4E5F6000000000142 /* CaleiTheme.swift in Sources */,
+				A1B2C3D4E5F6000000000143 /* ViewHelpers.swift in Sources */,
+				A1B2C3D4E5F6000000000144 /* SalePointDetailSheet.swift in Sources */,
+				A1B2C3D4E5F6000000000150 /* ZoneModels.swift in Sources */,
+				A1B2C3D4E5F6000000000151 /* ZonesService.swift in Sources */,
+				A1B2C3D4E5F6000000000152 /* ZonesManagementViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000153 /* ZonesManagementView.swift in Sources */,
+				A1B2C3D4E5F6000000000154 /* ZoneEditorSheet.swift in Sources */,
+				A1B2C3D4E5F6000000000155 /* ZoneDrawingMapView.swift in Sources */,
+				A1B2C3D4E5F6000000000160 /* HomeView.swift in Sources */,
+				A1B2C3D4E5F6000000000161 /* SideMenuView.swift in Sources */,
+				A1B2C3D4E5F6000000000162 /* PermissionsOnboardingView.swift in Sources */,
+				64193CC82F3B9C7F800ECB7B /* MarkedSalePointDetailSheet.swift in Sources */,
+				AD593984CB85B19D112D6828 /* ZoneDetailView.swift in Sources */,
+				A3A115100F88ED9ADA6F2334 /* ZoneSalePointDetailSheet.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A1B2C3D4E5F600000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A1B2C3D4E5F600000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A1B2C3D4E5F600000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Y3V8PQ8QJ;
+				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calei.swiftmobileios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1B2C3D4E5F600000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Y3V8PQ8QJ;
+				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calei.swiftmobileios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1B2C3D4E5F6000000000008 /* Build configuration list for PBXProject "SwiftMobileIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3D4E5F600000000000A /* Debug */,
+				A1B2C3D4E5F600000000000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1B2C3D4E5F6000000000009 /* Build configuration list for PBXNativeTarget "SwiftMobileIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3D4E5F600000000000C /* Debug */,
+				A1B2C3D4E5F600000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1B2C3D4E5F6000000000001 /* Project object */;
+}
