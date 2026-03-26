@@ -6,6 +6,7 @@ struct SideMenuView: View {
     @EnvironmentObject private var appState: AppState
     @Binding var isPresented: Bool
     @Binding var navigateToZones: Bool
+    @Binding var navigateToVisitPoint: Bool
     @Binding var selectedTab: Int
     
     var body: some View {
@@ -47,6 +48,22 @@ struct SideMenuView: View {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                         selectedTab = 3 // Tab de Admin
                                         navigateToZones = true
+                                    }
+                                }
+
+                                if appState.currentUser?.canAccessDeliveries == true {
+                                    MenuItemButton(
+                                        icon: "mappin.and.ellipse",
+                                        title: "Visitar Punto",
+                                        color: CaleiColors.accent
+                                    ) {
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            isPresented = false
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            selectedTab = 0 // Repartos
+                                            navigateToVisitPoint = true
+                                        }
                                     }
                                 }
                                 
@@ -179,6 +196,6 @@ struct MenuItemButton: View {
 }
 
 #Preview {
-    SideMenuView(isPresented: .constant(true), navigateToZones: .constant(false), selectedTab: .constant(0))
+    SideMenuView(isPresented: .constant(true), navigateToZones: .constant(false), navigateToVisitPoint: .constant(false), selectedTab: .constant(0))
         .environmentObject(AppState())
 }

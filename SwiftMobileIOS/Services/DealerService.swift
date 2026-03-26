@@ -59,6 +59,23 @@ final class DealerService {
         return try await client.request(endpoint, responseType: PrintTicketResponse.self)
     }
 
+    // MARK: - Arrivals (Visitar Punto)
+
+    func registerArrival(
+        orderId: Int,
+        timestamp: String? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil
+    ) async throws {
+        let body = RegisterArrivalRequest(
+            timestamp: timestamp,
+            latitude: latitude,
+            longitude: longitude
+        )
+        let endpoint = Endpoint(path: "/dealer/orders/\(orderId)/arrivals", method: .post, body: body)
+        _ = try await client.request(endpoint, responseType: EmptyResponse.self)
+    }
+
     // MARK: - Products
 
     func searchProducts(query: String, limit: Int = 20) async throws -> [Product] {

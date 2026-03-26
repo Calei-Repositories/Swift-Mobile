@@ -32,21 +32,21 @@ final class LocationService: NSObject, ObservableObject {
     
     /// Solicita una única actualización de ubicación (sin tracking continuo)
     func requestSingleLocation() {
-        print("📍 requestSingleLocation llamado, authStatus: \(authorizationStatus.rawValue)")
+        DLog("📍 requestSingleLocation llamado, authStatus:", authorizationStatus.rawValue)
         
         // Si no tenemos permisos, intentar solicitar
         if authorizationStatus == .notDetermined {
-            print("📍 Permisos no determinados, solicitando...")
+            DLog("📍 Permisos no determinados, solicitando...")
             requestPermission()
             return
         }
         
         guard authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways else {
-            print("📍 Sin permisos de ubicación")
+            DLog("📍 Sin permisos de ubicación")
             return
         }
         
-        print("📍 Solicitando ubicación única...")
+        DLog("📍 Solicitando ubicación única...")
         locationManager.requestLocation()
     }
     
@@ -96,7 +96,7 @@ extension LocationService: CLLocationManagerDelegate {
                manager.authorizationStatus == .authorizedAlways {
                 // Solo si no tenemos ubicación aún
                 if self.currentLocation == nil {
-                    print("📍 Permisos de ubicación otorgados, solicitando ubicación inicial...")
+                    DLog("📍 Permisos de ubicación otorgados, solicitando ubicación inicial...")
                     self.locationManager.requestLocation()
                 }
             }
@@ -113,7 +113,7 @@ extension LocationService: CLLocationManagerDelegate {
             self.currentLocation = location
             
             if isFirstLocation {
-                print("📍 Primera ubicación obtenida: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+                DLog("📍 Primera ubicación obtenida:", location.coordinate.latitude, location.coordinate.longitude)
             }
             
             if shouldSend {
@@ -125,7 +125,7 @@ extension LocationService: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         let errorMessage = error.localizedDescription
-        print("📍 Error de ubicación: \(errorMessage)")
+        DLog("📍 Error de ubicación:", errorMessage)
         Task { @MainActor in
             self.trackingError = errorMessage
         }

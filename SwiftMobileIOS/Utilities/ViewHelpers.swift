@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreHaptics
 
 // MARK: - Rounded Corner Shape
 
@@ -35,16 +36,19 @@ struct MapAnnotationItem: Identifiable {
 
 struct HapticFeedback {
     static func light() {
+        guard HapticFeedback.hapticsAvailable else { return }
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
     }
     
     static func medium() {
+        guard HapticFeedback.hapticsAvailable else { return }
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
     }
     
     static func heavy() {
+        guard HapticFeedback.hapticsAvailable else { return }
         let generator = UIImpactFeedbackGenerator(style: .heavy)
         generator.impactOccurred()
     }
@@ -60,8 +64,21 @@ struct HapticFeedback {
     }
     
     static func error() {
+        guard HapticFeedback.hapticsAvailable else { return }
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.error)
+    }
+}
+
+extension HapticFeedback {
+    static var hapticsAvailable: Bool {
+        // Avoid triggering CHHapticPattern library reads on Simulator.
+        if ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil { return false }
+
+        if #available(iOS 13.0, *) {
+            return CHHapticEngine.capabilitiesForHardware().supportsHaptics
+        }
+        return false
     }
 }
 

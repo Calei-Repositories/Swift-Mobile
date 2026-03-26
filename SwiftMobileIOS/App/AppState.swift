@@ -1,6 +1,14 @@
 import Foundation
 import SwiftUI
 
+// Ensure `DLog` is always available in the app module so new debug calls compile.
+@inline(__always) public func DLog(_ items: Any...) {
+    #if DEBUG
+    let message = items.map { "\($0)" }.joined(separator: " ")
+    print("[D] " + message)
+    #endif
+}
+
 @MainActor
 final class AppState: ObservableObject {
     @Published var currentUser: User?

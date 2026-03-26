@@ -29,6 +29,7 @@ struct ProductSearchView: View {
                 }
             }
             .navigationTitle("Productos")
+            .background(CaleiColors.systemSurface)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {

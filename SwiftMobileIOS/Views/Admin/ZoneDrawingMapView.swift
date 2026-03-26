@@ -14,7 +14,14 @@ extension Array {
 struct ZoneDrawingMapView: View {
     let initialPoints: [CLLocationCoordinate2D]
     let color: Color
+    let inline: Bool
+    /// When false, the bottom action controls (Deshacer/Eliminar/Limpiar) are hidden.
+    let showControls: Bool
     let onSave: ([CLLocationCoordinate2D]) -> Void
+    let onCancel: (() -> Void)?
+    let externalPoints: Binding<[CLLocationCoordinate2D]>?
+    let onSelect: ((Int?) -> Void)?
+    let externalSelectedIndex: Binding<Int?>?
     
     @Environment(\.dismiss) private var dismiss
     @State private var points: [CLLocationCoordinate2D] = []
@@ -29,11 +36,23 @@ struct ZoneDrawingMapView: View {
     init(
         initialPoints: [CLLocationCoordinate2D],
         color: Color,
-        onSave: @escaping ([CLLocationCoordinate2D]) -> Void
+        inline: Bool = false,
+        onSave: @escaping ([CLLocationCoordinate2D]) -> Void,
+        onCancel: (() -> Void)? = nil,
+        externalPoints: Binding<[CLLocationCoordinate2D]>? = nil,
+        onSelect: ((Int?) -> Void)? = nil,
+        externalSelectedIndex: Binding<Int?>? = nil,
+        showControls: Bool = true
     ) {
         self.initialPoints = initialPoints
         self.color = color
+        self.inline = inline
         self.onSave = onSave
+        self.onCancel = onCancel
+        self.externalPoints = externalPoints
+        self.onSelect = onSelect
+        self.externalSelectedIndex = externalSelectedIndex
+        self.showControls = showControls
         _points = State(initialValue: initialPoints)
         
         // Si hay puntos iniciales, centrar en ellos
@@ -48,97 +67,170 @@ struct ZoneDrawingMapView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                // Mapa interactivo
-                DrawingMapRepresentable(
-                    region: $region,
-                    points: $points,
-                    selectedPointIndex: $selectedPointIndex,
-                    draggingPointIndex: $draggingPointIndex,
-                    color: color
-                )
-                .ignoresSafeArea(edges: .bottom)
-                
-                // Instrucciones y controles superpuestos
-                VStack {
-                    // Instrucciones
-                    instructionsBar
-                    
-                    Spacer()
-                    
-                    // Controles inferiores
-                    bottomControls
-                }
-            }
-            .navigationTitle("Dibujar Perímetro")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancelar") {
-                        dismiss()
-                    }
-                    .foregroundColor(CaleiColors.gray500)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Guardar") {
-                        // Organizar puntos antes de guardar para evitar intersecciones
-                        let organizedPoints = PolygonOrganizer.organizePoints(points)
-                        onSave(organizedPoints)
-                    }
-                    .font(.headline)
-                    .foregroundColor(points.count >= 3 ? CaleiColors.accent : CaleiColors.gray400)
-                    .disabled(points.count < 3)
-                }
-            }
-            .confirmationDialog(
-                "¿Borrar todos los puntos?",
-                isPresented: $showClearConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Borrar todo", role: .destructive) {
-                    points.removeAll()
-                    selectedPointIndex = nil
-                }
-                Button("Cancelar", role: .cancel) {}
+        // Provide a binding to points for internal helpers and representable
+        let pointsBinding: Binding<[CLLocationCoordinate2D]> = {
+            if let ext = externalPoints { return ext }
+            return Binding(get: { points }, set: { points = $0 })
+        }()
+
+        // Core content used both inline and inside a NavigationView
+        let coreContent = ZStack {
+            // Mapa interactivo
+            DrawingMapRepresentable(
+                region: $region,
+                points: pointsBinding,
+                selectedPointIndex: externalSelectedIndex ?? $selectedPointIndex,
+                draggingPointIndex: $draggingPointIndex,
+                color: color
+            )
+            .ignoresSafeArea(edges: .bottom)
+
+            // Instrucciones y controles superpuestos
+            VStack {
+                // Instrucciones
+                instructionsBar
+
+                Spacer()
+
+                // Controles inferiores
+                bottomControls
             }
         }
+        .confirmationDialog(
+            "¿Borrar todos los puntos?",
+            isPresented: $showClearConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Borrar todo", role: .destructive) {
+                if let ext = externalPoints {
+                    ext.wrappedValue.removeAll()
+                } else {
+                    withAnimation(CaleiAnimations.quick) {
+                        points.removeAll()
+                    }
+                }
+                selectedPointIndex = nil
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            }
+            Button("Cancelar", role: .cancel) {}
+        }
+
+        // Build contentView as AnyView to avoid opaque return inference issues
+        let contentView: AnyView = {
+            if inline {
+                if let extSelected = externalSelectedIndex {
+                    let v = coreContent.onChange(of: extSelected.wrappedValue) { _, new in onSelect?(new) }
+                    return AnyView(v)
+                } else {
+                    let v = coreContent.onChange(of: selectedPointIndex) { _, new in onSelect?(new) }
+                    return AnyView(v)
+                }
+            } else {
+                if let extSelected = externalSelectedIndex {
+                    let v = NavigationView {
+                        coreContent.onChange(of: extSelected.wrappedValue) { _, new in onSelect?(new) }
+                            .navigationTitle("Dibujar Perímetro")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button("Cancelar") {
+                                        if let onCancel = onCancel { onCancel() } else { dismiss() }
+                                    }
+                                    .foregroundColor(CaleiColors.gray500)
+                                }
+
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button("Guardar") {
+                                        let organizedPoints = PolygonOrganizer.organizePoints(pointsBinding.wrappedValue)
+                                        onSave(organizedPoints)
+                                    }
+                                    .font(.headline)
+                                    .foregroundColor(pointsBinding.wrappedValue.count >= 3 ? CaleiColors.accent : CaleiColors.gray400)
+                                    .disabled(pointsBinding.wrappedValue.count < 3)
+                                }
+                            }
+                    }
+                    return AnyView(v)
+                } else {
+                    let v = NavigationView {
+                        coreContent.onChange(of: selectedPointIndex) { _, new in onSelect?(new) }
+                            .navigationTitle("Dibujar Perímetro")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button("Cancelar") {
+                                        if let onCancel = onCancel { onCancel() } else { dismiss() }
+                                    }
+                                    .foregroundColor(CaleiColors.gray500)
+                                }
+
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button("Guardar") {
+                                        let organizedPoints = PolygonOrganizer.organizePoints(pointsBinding.wrappedValue)
+                                        onSave(organizedPoints)
+                                    }
+                                    .font(.headline)
+                                    .foregroundColor(pointsBinding.wrappedValue.count >= 3 ? CaleiColors.accent : CaleiColors.gray400)
+                                    .disabled(pointsBinding.wrappedValue.count < 3)
+                                }
+                            }
+                    }
+                    return AnyView(v)
+                }
+            }
+        }()
+
+        return contentView
     }
     
     // MARK: - Instructions Bar
-    
-    private var instructionsBar: some View {
-        HStack(spacing: 8) {
-            Image(systemName: draggingPointIndex != nil ? "hand.draw.fill" : "hand.tap.fill")
-                .font(.system(size: 14))
-            
-            Text(draggingPointIndex != nil ? "Arrastrá para mover el punto" : "Tocá para agregar • Mantené presionado para mover")
-                .font(CaleiTypography.caption)
+
+    private var instructionsBar: AnyView {
+        // Hide the top instruction pill for inline editors (we assume surrounding UI explains controls)
+        if inline {
+            return AnyView(EmptyView())
         }
-        .foregroundColor(.white)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(
-            Capsule()
-                .fill(draggingPointIndex != nil ? CaleiColors.accent.opacity(0.9) : Color.black.opacity(0.7))
+
+        return AnyView(
+            HStack(spacing: 8) {
+                Image(systemName: draggingPointIndex != nil ? "hand.draw.fill" : "hand.tap.fill")
+                    .font(.system(size: 14))
+
+                Text(draggingPointIndex != nil ? "Arrastrá para mover el punto" : "Toca para agregar • Mantené presionado para mover")
+                    .font(CaleiTypography.caption)
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                Capsule()
+                    .fill(draggingPointIndex != nil ? CaleiColors.accent.opacity(0.9) : Color.black.opacity(0.7))
+            )
+            .padding(.top, 8)
         )
-        .padding(.top, 8)
     }
     
     // MARK: - Bottom Controls
-    
-    private var bottomControls: some View {
-        VStack(spacing: 12) {
+
+    private var bottomControls: AnyView {
+        // Provide a binding to points for internal helpers
+        let pointsBinding: Binding<[CLLocationCoordinate2D]> = {
+            if let ext = externalPoints { return ext }
+            return Binding(get: { points }, set: { points = $0 })
+        }()
+
+        if !showControls { return AnyView(EmptyView()) }
+
+        let v = VStack(spacing: 12) {
             // Info de puntos
             HStack {
-                Label("\(points.count) puntos", systemImage: "mappin.circle.fill")
+                Label("\(pointsBinding.wrappedValue.count) puntos", systemImage: "mappin.circle.fill")
                     .font(CaleiTypography.bodySmall)
                     .foregroundColor(CaleiColors.dark)
-                
+
                 Spacer()
-                
-                if points.count >= 3 {
+
+                if pointsBinding.wrappedValue.count >= 3 {
                     Label("Polígono válido", systemImage: "checkmark.circle.fill")
                         .font(CaleiTypography.caption)
                         .foregroundColor(CaleiColors.success)
@@ -148,14 +240,19 @@ struct ZoneDrawingMapView: View {
                         .foregroundColor(CaleiColors.warning)
                 }
             }
-            
+
             // Botones de acción
             HStack(spacing: 12) {
                 // Deshacer último punto
                 Button {
-                    if !points.isEmpty {
-                        points.removeLast()
-                        selectedPointIndex = nil
+                    var vv = pointsBinding.wrappedValue
+                    if !vv.isEmpty {
+                        withAnimation(CaleiAnimations.quick) {
+                            vv.removeLast()
+                            pointsBinding.wrappedValue = vv
+                            selectedPointIndex = nil
+                        }
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     }
                 } label: {
                     HStack(spacing: 6) {
@@ -163,18 +260,25 @@ struct ZoneDrawingMapView: View {
                         Text("Deshacer")
                     }
                     .font(CaleiTypography.buttonSmall)
-                    .foregroundColor(points.isEmpty ? CaleiColors.gray400 : CaleiColors.accent)
+                    .foregroundColor(pointsBinding.wrappedValue.isEmpty ? CaleiColors.gray400 : CaleiColors.accent)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(CaleiColors.accentSoft)
                     .cornerRadius(10)
                 }
-                .disabled(points.isEmpty)
-                
+                .disabled(pointsBinding.wrappedValue.isEmpty)
+
                 // Eliminar punto seleccionado
                 Button {
-                    if let index = selectedPointIndex, index < points.count {
-                        points.remove(at: index)
+                    if let index = selectedPointIndex {
+                        var vv = pointsBinding.wrappedValue
+                        if index < vv.count {
+                            withAnimation(CaleiAnimations.quick) {
+                                vv.remove(at: index)
+                                pointsBinding.wrappedValue = vv
+                            }
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        }
                         selectedPointIndex = nil
                     }
                 } label: {
@@ -190,7 +294,7 @@ struct ZoneDrawingMapView: View {
                     .cornerRadius(10)
                 }
                 .disabled(selectedPointIndex == nil)
-                
+
                 // Limpiar todo
                 Button {
                     showClearConfirmation = true
@@ -200,13 +304,13 @@ struct ZoneDrawingMapView: View {
                         Text("Limpiar")
                     }
                     .font(CaleiTypography.buttonSmall)
-                    .foregroundColor(points.isEmpty ? CaleiColors.gray400 : CaleiColors.gray600)
+                    .foregroundColor(pointsBinding.wrappedValue.isEmpty ? CaleiColors.gray400 : CaleiColors.gray600)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(CaleiColors.gray100)
                     .cornerRadius(10)
                 }
-                .disabled(points.isEmpty)
+                .disabled(pointsBinding.wrappedValue.isEmpty)
             }
         }
         .padding(16)
@@ -217,7 +321,10 @@ struct ZoneDrawingMapView: View {
         )
         .padding(.horizontal)
         .padding(.bottom, 8)
+
+        return AnyView(v)
     }
+
 }
 
 // MARK: - Polygon Organizer
@@ -425,13 +532,16 @@ struct DrawingMapRepresentable: UIViewRepresentable {
                 }
             }
             
-            // Agregar nuevo punto
-            parent.points.append(coordinate)
-            parent.selectedPointIndex = nil
-            
+            // Agregar nuevo punto (animado y con háptica)
+            DispatchQueue.main.async {
+                withAnimation(CaleiAnimations.quick) {
+                    self.parent.points.append(coordinate)
+                    self.parent.selectedPointIndex = nil
+                }
+            }
+
             // Haptic feedback
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }
         
         @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {

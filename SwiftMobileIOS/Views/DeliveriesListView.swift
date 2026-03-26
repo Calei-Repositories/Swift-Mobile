@@ -22,7 +22,7 @@ struct DeliveriesListView: View {
                     deliveryList
                 }
             }
-            .background(CaleiColors.background)
+            .background(CaleiColors.systemSurface)
             .navigationTitle("Repartos")
             .toolbar { toolbarContent }
             .task { await viewModel.load() }

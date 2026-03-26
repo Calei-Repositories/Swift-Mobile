@@ -183,6 +183,12 @@ struct UpdateDeliveryItemRequest: Encodable {
     let note: String?
 }
 
+struct RegisterArrivalRequest: Encodable {
+    let timestamp: String?
+    let latitude: Double?
+    let longitude: Double?
+}
+
 struct PrintTicketResponse: Codable {
     let success: Bool
     let ticketId: Int?

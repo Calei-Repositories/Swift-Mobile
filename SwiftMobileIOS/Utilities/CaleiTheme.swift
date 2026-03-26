@@ -462,6 +462,42 @@ extension View {
             .background(status.color.opacity(0.12))
             .cornerRadius(6)
     }
+
+    /// Nuevo: estilo moderno de tarjeta usando materiales translúcidos y grises del sistema.
+    func modernCardStyle(cornerRadius: CGFloat = 16) -> some View {
+        self
+            .padding(16)
+            .background(.ultraThinMaterial)
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color(UIColor.systemGray6).opacity(0.6))
+            )
+            .cornerRadius(cornerRadius)
+            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+    }
+
+    /// Nuevo: superficie moderna (superficies menos prominentes)
+    func modernSurfaceStyle(cornerRadius: CGFloat = 12) -> some View {
+        self
+            .padding(12)
+            .background(.ultraThinMaterial)
+            .cornerRadius(cornerRadius)
+    }
+}
+
+// MARK: - System Aliases
+extension CaleiColors {
+    /// Alias que prioriza colores del sistema para superficies neutrales (systemGray6)
+    static var systemSurface: Color { Color(UIColor.systemGray6) }
+
+    /// Alias para secondary system background
+    static var systemSecondarySurface: Color { Color(UIColor.secondarySystemBackground) }
+
+    /// Alias semántico para background del sistema
+    static var systemBackground: Color { Color(UIColor.systemBackground) }
+
+    /// Alias para semantic primary color
+    static var semanticPrimary: Color { Color(UIColor.label) }
 }
 
 // MARK: - Status Enum

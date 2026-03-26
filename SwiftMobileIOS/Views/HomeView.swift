@@ -27,7 +27,7 @@ struct HomeView: View {
                 .padding(.horizontal, CaleiSpacing.space6)
                 .padding(.top, CaleiSpacing.space10)
             }
-            .background(CaleiColors.background)
+            .background(CaleiColors.systemSurface)
             .navigationBarHidden(true)
             .navigationDestination(isPresented: $navigateToTracks) {
                 TracksListView()

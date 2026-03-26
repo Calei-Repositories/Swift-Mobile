@@ -22,6 +22,8 @@ final class ZonesManagementViewModel: ObservableObject {
     @Published var state: ZonesViewState = .idle
     @Published var searchText: String = ""
     @Published var errorMessage: String?
+    @Published var lastServerErrorBody: String? = nil
+    @Published var lastFieldErrors: [String: String]? = nil
     @Published var isCreating = false
     @Published var isDeleting = false
     @Published var isLoadingMapPoints = false
@@ -35,13 +37,39 @@ final class ZonesManagementViewModel: ObservableObject {
     // MARK: - Computed Properties
     
     var filteredZones: [GeoZone] {
-        if searchText.isEmpty {
-            return zones
-        }
-        return zones.filter { zone in
+        let base = searchText.isEmpty ? zones : zones.filter { zone in
             zone.name.localizedCaseInsensitiveContains(searchText) ||
             (zone.description?.localizedCaseInsensitiveContains(searchText) ?? false)
         }
+        return Self.sortedWithRecentFirst(base, recentCount: 3)
+    }
+
+    /// Returns an array where the `recentCount` most-recently-updated zones appear
+    /// at the top (sorted among themselves by recency, newest first), and the
+    /// remainder are sorted alphabetically by name.
+    private static func sortedWithRecentFirst(_ list: [GeoZone], recentCount: Int) -> [GeoZone] {
+        // Parse ISO8601 date string (with or without fractional seconds)
+        let isoFull = ISO8601DateFormatter()
+        isoFull.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let isoBasic = ISO8601DateFormatter()
+        isoBasic.formatOptions = [.withInternetDateTime]
+
+        func updatedDate(_ zone: GeoZone) -> Date {
+            let raw = zone.updatedAt ?? zone.createdAt ?? ""
+            return isoFull.date(from: raw) ?? isoBasic.date(from: raw) ?? .distantPast
+        }
+
+        // Sort full list by recency to find the top N
+        let byRecency = list.sorted { updatedDate($0) > updatedDate($1) }
+        let recentSlice = Array(byRecency.prefix(recentCount))
+        let recentIds = Set(recentSlice.map(\.id))
+
+        // Rest sorted alphabetically
+        let rest = list
+            .filter { !recentIds.contains($0.id) }
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+
+        return recentSlice + rest
     }
     
     var activeZones: [GeoZone] {
@@ -95,17 +123,17 @@ final class ZonesManagementViewModel: ObservableObject {
     
     /// Obtener los puntos de venta que están dentro de una zona específica
     func salePointsForZone(_ zone: GeoZone) -> [MarkedSalePoint] {
-        print("📍 salePointsForZone called for zone: \(zone.name)")
-        print("📍 Total markedPoints available: \(markedPoints.count)")
+        DLog("📍 salePointsForZone called for zone:", zone.name)
+        DLog("📍 Total markedPoints available:", markedPoints.count)
         
         guard let boundaryPoints = zone.boundaryPoints, boundaryPoints.count >= 3 else {
-            print("⚠️ Zone has no valid boundary points")
+            DLog("⚠️ Zone has no valid boundary points")
             return []
         }
         
         let polygon = boundaryPoints.compactMap { $0.coordinate }
         guard polygon.count >= 3 else {
-            print("⚠️ Polygon has less than 3 coordinates")
+            DLog("⚠️ Polygon has less than 3 coordinates")
             return []
         }
         
@@ -114,7 +142,7 @@ final class ZonesManagementViewModel: ObservableObject {
             return isPointInPolygon(point: pointCoord, polygon: polygon)
         }
         
-        print("📍 Filtered sale points for \(zone.name): \(filtered.count)")
+        DLog("📍 Filtered sale points for", zone.name + ":", filtered.count)
         return filtered
     }
     
@@ -180,26 +208,26 @@ final class ZonesManagementViewModel: ObservableObject {
         // Cargar zonas primero
         do {
             zones = try await zonesService.listZones()
-            print("✅ Zonas cargadas: \(zones.count)")
+            DLog("✅ Zonas cargadas:", zones.count)
         } catch {
             zonesLoadError = error
-            print("❌ Error cargando zonas: \(error)")
+            DLog("❌ Error cargando zonas:", error)
         }
         
         // Cargar puntos marcados (puede fallar independientemente)
         do {
-            print("🔄 Iniciando carga de puntos marcados...")
+            DLog("🔄 Iniciando carga de puntos marcados...")
             markedPoints = try await adminService.markedSalePointsMap(zoneId: nil, from: nil, to: nil, markedBy: nil, n: nil, s: nil, e: nil, w: nil)
-            print("✅ Puntos marcados cargados: \(markedPoints.count)")
+            DLog("✅ Puntos marcados cargados:", markedPoints.count)
             if markedPoints.isEmpty {
-                print("⚠️ La API devolvió un array vacío de puntos marcados")
+                DLog("⚠️ La API devolvió un array vacío de puntos marcados")
             } else {
-                print("📍 Ejemplo punto: \(markedPoints.first?.name ?? "N/A") en (\(markedPoints.first?.latitude ?? 0), \(markedPoints.first?.longitude ?? 0))")
+                DLog("📍 Ejemplo punto:", markedPoints.first?.name ?? "N/A", "en (", markedPoints.first?.latitude ?? 0, ",", markedPoints.first?.longitude ?? 0, ")")
             }
         } catch {
             pointsLoadError = error
-            print("❌ Error cargando puntos marcados: \(error)")
-            print("❌ Error detallado: \(error.localizedDescription)")
+            DLog("❌ Error cargando puntos marcados:", error)
+            DLog("❌ Error detallado:", error.localizedDescription)
         }
         
         if zones.isEmpty && markedPoints.isEmpty {
@@ -220,14 +248,14 @@ final class ZonesManagementViewModel: ObservableObject {
         do {
             zones = try await zonesService.listZones()
         } catch {
-            print("Error refrescando zonas: \(error)")
+            DLog("Error refrescando zonas:", error)
         }
         
         do {
             markedPoints = try await adminService.markedSalePointsMap(zoneId: nil, from: nil, to: nil, markedBy: nil, n: nil, s: nil, e: nil, w: nil)
             visibleSalePoints = markedPoints
         } catch {
-            print("Error refrescando puntos: \(error)")
+            DLog("Error refrescando puntos:", error)
         }
         
         state = .loaded
@@ -273,9 +301,9 @@ final class ZonesManagementViewModel: ObservableObject {
                 w: west
             )
             visibleSalePoints = points
-            print("📍 Cargados \(points.count) puntos para región visible")
+            DLog("📍 Cargados", points.count, "puntos para región visible")
         } catch {
-            print("❌ Error cargando puntos por región: \(error)")
+            DLog("❌ Error cargando puntos por región:", error)
             // En caso de error, usar los puntos ya cargados filtrados localmente
             visibleSalePoints = markedPoints.filter { point in
                 point.latitude >= south && point.latitude <= north &&
@@ -305,8 +333,11 @@ final class ZonesManagementViewModel: ObservableObject {
     func createZone(name: String, isDangerous: Bool, boundaryPoints: [CLLocationCoordinate2D]?) async -> GeoZone? {
         isCreating = true
         defer { isCreating = false }
-        
         do {
+            // Reset previous server errors
+            lastServerErrorBody = nil
+            lastFieldErrors = nil
+
             let newZone = try await zonesService.createZone(
                 name: name,
                 isDangerous: isDangerous,
@@ -315,7 +346,43 @@ final class ZonesManagementViewModel: ObservableObject {
             zones.insert(newZone, at: 0)
             return newZone
         } catch {
-            errorMessage = "Error al crear zona: \(error.localizedDescription)"
+            DLog("ZonesManagementViewModel.createZone error:", error)
+
+            // If the APIClient included the server body inside an APIError.other NSError, extract it
+            if let apiErr = error as? APIError {
+                switch apiErr {
+                case .other(let inner):
+                    let body = inner.localizedDescription
+                    lastServerErrorBody = body
+
+                    // Try to decode structured field errors from the body
+                    if let data = body.data(using: .utf8) {
+                        do {
+                            let parsed = try JSONDecoder().decode(APIErrorResponse.self, from: data)
+                            var map: [String: String] = [:]
+                            if let errs = parsed.errors {
+                                for e in errs {
+                                    if let field = e.field, let msg = e.message {
+                                        map[field] = msg
+                                    }
+                                }
+                            }
+                            if !map.isEmpty {
+                                lastFieldErrors = map
+                            }
+                        } catch {
+                            DLog("No se pudo parsear body de error como JSON:", error)
+                        }
+                    }
+
+                    errorMessage = "Error al crear zona: \(body)"
+                default:
+                    errorMessage = "Error al crear zona: \(error.localizedDescription)"
+                }
+            } else {
+                errorMessage = "Error al crear zona: \(error.localizedDescription)"
+            }
+
             return nil
         }
     }
@@ -346,22 +413,50 @@ final class ZonesManagementViewModel: ObservableObject {
             return false
         }
     }
+
+    /// Update the `isDangerous` flag locally for a zone (optimistic UI update)
+    func setZoneDangerousLocally(zoneId: Int, isDangerous: Bool) {
+        if let index = zones.firstIndex(where: { $0.id == zoneId }) {
+            let z = zones[index]
+            let newZone = GeoZone(
+                id: z.id,
+                name: z.name,
+                description: z.description,
+                color: z.color,
+                isDangerous: isDangerous,
+                isActive: z.isActive,
+                createdAt: z.createdAt,
+                updatedAt: z.updatedAt,
+                boundaryPoints: z.boundaryPoints,
+                salePoints: z.salePoints,
+                _count: z._count
+            )
+            zones[index] = newZone
+
+            if selectedZone?.id == zoneId {
+                selectedZone = newZone
+            }
+        }
+    }
     
     /// Eliminar una zona
     func deleteZone(_ zone: GeoZone) async -> Bool {
         isDeleting = true
         defer { isDeleting = false }
-        
+
+        // Optimistic removal: update UI immediately before the network call
+        let previousZones = zones
+        zones.removeAll { $0.id == zone.id }
+        if selectedZone?.id == zone.id {
+            selectedZone = nil
+        }
+
         do {
             try await zonesService.deleteZone(id: zone.id)
-            zones.removeAll { $0.id == zone.id }
-            
-            if selectedZone?.id == zone.id {
-                selectedZone = nil
-            }
-            
             return true
         } catch {
+            // Rollback on failure
+            zones = previousZones
             errorMessage = "Error al eliminar zona: \(error.localizedDescription)"
             return false
         }
@@ -501,12 +596,12 @@ final class ZonesManagementViewModel: ObservableObject {
             // Debug: mostrar qué campos se están enviando
             if let data = try? JSONEncoder().encode(request),
                let jsonString = String(data: data, encoding: .utf8) {
-                print("📤 Enviando PATCH a /admin/marked-sale-points/\(id)")
-                print("📤 Body: \(jsonString)")
+                DLog("📤 Enviando PATCH a /admin/marked-sale-points/", id)
+                DLog("📤 Body:", jsonString)
             }
             
             let updated: MarkedSalePoint = try await APIClient.shared.request(endpoint, responseType: MarkedSalePoint.self)
-            print("✅ Punto de venta actualizado correctamente: \(updated.name)")
+            DLog("✅ Punto de venta actualizado correctamente:", updated.name)
             
             // Actualizar en la lista local
             if let index = markedPoints.firstIndex(where: { $0.id == id }) {
@@ -514,16 +609,16 @@ final class ZonesManagementViewModel: ObservableObject {
             }
         } catch let error as APIError {
             errorMessage = "Error al actualizar punto de venta: \(error.localizedDescription)"
-            print("❌ Error API al actualizar sale point: \(error)")
+            DLog("❌ Error API al actualizar sale point:", error)
             
             // Si el endpoint admin no existe, intentar con el endpoint normal
             if case .httpStatus(let code) = error, code == 404 {
-                print("⚠️ Endpoint admin no encontrado, intentando con /sale-points/\(id)")
+                DLog("⚠️ Endpoint admin no encontrado, intentando con /sale-points/", id)
                 await updateSalePointFallback(id: id, request: request)
             }
         } catch {
             errorMessage = "Error al actualizar punto de venta: \(error.localizedDescription)"
-            print("❌ Error general al actualizar sale point: \(error)")
+            DLog("❌ Error general al actualizar sale point:", error)
         }
     }
     
@@ -532,13 +627,13 @@ final class ZonesManagementViewModel: ObservableObject {
         do {
             let endpoint = Endpoint(path: "/sale-points/\(id)", method: .patch, body: request)
             let updated: MarkedSalePoint = try await APIClient.shared.request(endpoint, responseType: MarkedSalePoint.self)
-            print("✅ Punto de venta actualizado (fallback): \(updated.name)")
+            DLog("✅ Punto de venta actualizado (fallback):", updated.name)
             
             if let index = markedPoints.firstIndex(where: { $0.id == id }) {
                 markedPoints[index] = updated
             }
         } catch {
-            print("❌ Error en fallback: \(error)")
+            DLog("❌ Error en fallback:", error)
         }
     }
     
@@ -549,7 +644,7 @@ final class ZonesManagementViewModel: ObservableObject {
             let endpoint = Endpoint(path: "/sale-points", method: .get, queryItems: queryItems)
             return try await APIClient.shared.request(endpoint, responseType: [MarkedSalePoint].self)
         } catch {
-            print("Error loading sale points for zone \(zoneId): \(error)")
+            DLog("Error loading sale points for zone", zoneId, ":", error)
             return []
         }
     }

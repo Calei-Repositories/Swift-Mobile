@@ -62,7 +62,7 @@ final class RecordingNotificationService: NSObject, ObservableObject {
     @objc private func appDidEnterBackground() {
         // Re-publicar la notificación cuando la app va a background
         if !currentTrackName.isEmpty {
-            print("📱 App went to background - publishing notification for: \(currentTrackName)")
+            DLog("📱 App went to background - publishing notification for:", currentTrackName)
             // Delay pequeño para asegurar que la app esté completamente en background
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
                 self?.republishNotification()
@@ -72,15 +72,15 @@ final class RecordingNotificationService: NSObject, ObservableObject {
     
     @objc private func appWillEnterForeground() {
         // No hacer nada al volver - la notificación ya está en el centro de notificaciones
-        print("📱 App will enter foreground")
+        DLog("📱 App will enter foreground")
     }
     
     private func republishNotification() {
         guard !currentTrackName.isEmpty else {
-            print("⚠️ republishNotification called but currentTrackName is empty")
+            DLog("⚠️ republishNotification called but currentTrackName is empty")
             return
         }
-        print("🔄 Republishing notification for: \(currentTrackName)")
+        DLog("🔄 Republishing notification for:", currentTrackName)
         publishNotification(
             trackName: currentTrackName,
             isPaused: isRecordingPaused,
@@ -103,7 +103,7 @@ final class RecordingNotificationService: NSObject, ObservableObject {
             
             return granted
         } catch {
-            print("Error requesting notification authorization: \(error)")
+            DLog("Error requesting notification authorization:", error)
             return false
         }
     }
@@ -161,7 +161,7 @@ final class RecordingNotificationService: NSObject, ObservableObject {
         )
         
         UNUserNotificationCenter.current().setNotificationCategories([recordingCategory, pausedCategory])
-        print("📋 Notification categories registered")
+        DLog("📋 Notification categories registered")
     }
     
     // MARK: - Recording Notification
@@ -173,14 +173,14 @@ final class RecordingNotificationService: NSObject, ObservableObject {
         startTime: Date? = nil,
         points: Int = 0
     ) {
-        print("🔔 showRecordingNotification called - trackName: \(trackName), isAuthorized: \(isAuthorized)")
+        DLog("🔔 showRecordingNotification called - trackName:", trackName + ", isAuthorized:", isAuthorized)
         
         // Verificar autorización dinámicamente
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
             guard let self = self else { return }
             
             let authorized = settings.authorizationStatus == .authorized
-            print("🔔 Notification settings - status: \(settings.authorizationStatus.rawValue), authorized: \(authorized)")
+            DLog("🔔 Notification settings - status:", settings.authorizationStatus.rawValue, "authorized:", authorized)
             
             if !authorized {
                 Task {
@@ -248,13 +248,13 @@ final class RecordingNotificationService: NSObject, ObservableObject {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [recordingNotificationId])
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [recordingNotificationId])
         
-        print("🔔 Adding recording notification: \(trackName), isPaused: \(isPaused)")
+        DLog("🔔 Adding recording notification:", trackName + ", isPaused:", isPaused)
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("❌ Error showing recording notification: \(error)")
+                DLog("❌ Error showing recording notification:", error)
             } else {
-                print("✅ Recording notification scheduled successfully")
+                DLog("✅ Recording notification scheduled successfully")
             }
         }
     }

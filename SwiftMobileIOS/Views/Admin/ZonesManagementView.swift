@@ -7,14 +7,19 @@ struct ZonesManagementView: View {
     @StateObject private var viewModel = ZonesManagementViewModel()
     @State private var selectedTab: ZonesTab = .list
     @State private var showCreateSheet = false
+    @State private var createFieldErrors: [String: String]? = nil
     @State private var selectedZoneForEdit: GeoZone?
     @State private var showDeleteConfirmation = false
     @State private var zoneToDelete: GeoZone?
+    @State private var deleteErrorMessage: String? = nil
+    @State private var showDeleteError = false
     @State private var showAssignSheet = false
     @State private var zoneToAssign: GeoZone?
     @State private var selectedSalePoint: MarkedSalePoint?
     @State private var showSalePointDetail = false
     @State private var selectedZoneForDetail: GeoZone?
+    @State private var createErrorMessage: String? = nil
+    @State private var selectedZoneOnMap: GeoZone? = nil
     
     enum ZonesTab: String, CaseIterable {
         case list = "Lista"
@@ -70,30 +75,55 @@ struct ZonesManagementView: View {
             ZoneDetailView(zone: zone, salePoints: viewModel.salePointsForZone(zone))
         }
         .sheet(isPresented: $showCreateSheet) {
-            ZoneEditorSheet(mode: .create) { name, isDangerous, points in
-                Task {
-                    _ = await viewModel.createZone(
-                        name: name,
-                        isDangerous: isDangerous,
-                        boundaryPoints: points
-                    )
+            ZoneEditorSheet(mode: .create, onSave: { name, isDangerous, points in
+                let created = await viewModel.createZone(
+                    name: name,
+                    isDangerous: isDangerous,
+                    boundaryPoints: points
+                )
+
+                if let _ = created {
+                    await viewModel.loadZones()
+                    // clear previous server errors
+                    createFieldErrors = nil
+                    createErrorMessage = nil
+                    return true
+                } else {
+                    DLog("Failed to create zone:", name)
+                    // propagate parsed field errors / server body to the sheet bindings
+                    createFieldErrors = viewModel.lastFieldErrors
+                    createErrorMessage = viewModel.lastServerErrorBody ?? viewModel.errorMessage
+                    return false
                 }
-            }
+            }, serverFieldErrors: $createFieldErrors, serverErrorMessage: $createErrorMessage)
         }
+        // createErrorMessage is surfaced inside the `ZoneEditorSheet` now to avoid
+        // presenting alerts from a controller that might not be in the window hierarchy.
         .sheet(item: $selectedZoneForEdit) { zone in
-            ZoneEditorSheet(mode: .edit(zone)) { name, isDangerous, points in
-                Task {
-                    let success = await viewModel.updateZone(
-                        id: zone.id,
-                        name: name,
-                        isDangerous: isDangerous,
-                        isActive: nil
-                    )
-                    if success, let points = points, !points.isEmpty {
-                        _ = await viewModel.updateBoundaryPoints(zoneId: zone.id, points: points)
-                    }
+            ZoneEditorSheet(mode: .edit(zone), onSave: { name, isDangerous, points in
+                // Attempt to persist on server
+                let success = await viewModel.updateZone(
+                    id: zone.id,
+                    name: name,
+                    isDangerous: isDangerous,
+                    isActive: nil
+                )
+
+                // If there are perimeter points to update, do it (server call will update local model)
+                if success, let points = points, !points.isEmpty {
+                    _ = await viewModel.updateBoundaryPoints(zoneId: zone.id, points: points)
                 }
-            }
+
+                if success {
+                    // Optimistically update the local model to reflect `isDangerous` immediately
+                    viewModel.setZoneDangerousLocally(zoneId: zone.id, isDangerous: isDangerous)
+
+                    // DON'T force reload from server here to avoid overwriting optimistic change
+                    return true
+                }
+
+                return false
+            }, serverFieldErrors: .constant(nil), serverErrorMessage: .constant(nil))
         }
         .sheet(item: $zoneToAssign) { zone in
             ZoneAssignmentSheet(zone: zone, viewModel: viewModel)
@@ -118,7 +148,15 @@ struct ZonesManagementView: View {
             Button("Eliminar", role: .destructive) {
                 if let zone = zoneToDelete {
                     Task {
-                        _ = await viewModel.deleteZone(zone)
+                        let success = await viewModel.deleteZone(zone)
+                        if success, selectedZoneOnMap?.id == zone.id {
+                            selectedZoneOnMap = nil
+                        }
+                        zoneToDelete = nil
+                        if !success {
+                            deleteErrorMessage = viewModel.errorMessage ?? "No se pudo eliminar la zona."
+                            showDeleteError = true
+                        }
                     }
                 }
             }
@@ -129,6 +167,11 @@ struct ZonesManagementView: View {
             if let zone = zoneToDelete {
                 Text("Se eliminará la zona \"\(zone.name)\" y todas sus asignaciones. Esta acción no se puede deshacer.")
             }
+        }
+        .alert("Error al eliminar", isPresented: $showDeleteError) {
+            Button("Cerrar", role: .cancel) { deleteErrorMessage = nil }
+        } message: {
+            Text(deleteErrorMessage ?? "No se pudo eliminar la zona.")
         }
         .task {
             await viewModel.loadZones()
@@ -189,59 +232,93 @@ struct ZonesManagementView: View {
     }
     
     private var zonesList: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(viewModel.filteredZones) { zone in
-                    Button {
+        List {
+            ForEach(viewModel.filteredZones) { zone in
+                ZoneCardNew(
+                    zone: zone,
+                    salePointsCount: viewModel.salePointsCount(for: zone),
+                    onTap: {
                         selectedZoneForDetail = zone
-                    } label: {
-                        ZoneCardNew(
-                            zone: zone,
-                            salePointsCount: viewModel.salePointsCount(for: zone),
-                            onTap: nil,
-                            onEdit: {
-                                selectedZoneForEdit = zone
-                            },
-                            onDelete: {
-                                zoneToDelete = zone
-                                showDeleteConfirmation = true
-                            },
-                            onAssign: {
-                                zoneToAssign = zone
-                            }
-                        )
+                    },
+                    onEdit: {
+                        selectedZoneForEdit = zone
+                    },
+                    onDelete: {
+                        zoneToDelete = zone
+                        showDeleteConfirmation = true
+                    },
+                    onAssign: {
+                        zoneToAssign = zone
                     }
-                    .buttonStyle(.plain)
+                )
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        zoneToDelete = zone
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Eliminar", systemImage: "trash")
+                    }
+                    Button {
+                        selectedZoneForEdit = zone
+                    } label: {
+                        Label("Editar", systemImage: "pencil")
+                    }
+                    .tint(CaleiColors.accent)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
         }
+        .listStyle(.plain)
+        .background(CaleiColors.background)
+        .scrollContentBackground(.hidden)
     }
     
     // MARK: - Map Content
     
     private var zonesMapContent: some View {
-        ZonesMapView(
-            zones: viewModel.zones,
-            salePoints: viewModel.visibleSalePoints,
-            onZoneTap: { zone in
-                selectedZoneForDetail = zone
-            },
-            onSalePointTap: { salePoint in
-                selectedSalePoint = salePoint
-                showSalePointDetail = true
-            },
-            onZoneLongPress: { zone in
-                // Mantener presionado abre la interfaz de asignar
-                zoneToAssign = zone
-            },
-            onRegionChanged: { region in
-                Task {
-                    await viewModel.loadSalePointsInRegion(region)
+        VStack(spacing: 12) {
+            ZonesMapView(
+                zones: viewModel.zones,
+                salePoints: selectedZoneOnMap.map { viewModel.salePointsForZone($0) } ?? viewModel.visibleSalePoints,
+                selectedZoneId: selectedZoneOnMap?.id,
+                onZoneTap: { zone in
+                    selectedZoneOnMap = zone
+                },
+                onSalePointTap: { salePoint in
+                    selectedSalePoint = salePoint
+                    showSalePointDetail = true
+                },
+                onZoneLongPress: { zone in
+                    // Mantener presionado abre la interfaz de asignar
+                    zoneToAssign = zone
+                },
+                onRegionChanged: { region in
+                    Task {
+                        await viewModel.loadSalePointsInRegion(region)
+                    }
                 }
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            if let zone = selectedZoneOnMap {
+                Button {
+                    zoneToAssign = zone
+                } label: {
+                    Text("+ Asignar")
+                        .font(CaleiTypography.button)
+                        .foregroundColor(.white)
+                        .frame(width: 170)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 18)
+                        .background(CaleiColors.accent)
+                        .cornerRadius(12)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 92)
             }
-        )
+        }
         .ignoresSafeArea(edges: .bottom)
     }
     
@@ -346,79 +423,103 @@ struct ZoneCardNew: View {
     let onEdit: () -> Void
     let onDelete: () -> Void
     let onAssign: () -> Void
+    @State private var isExpanded: Bool = false
     
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            // Contenido izquierdo
-            VStack(alignment: .leading, spacing: 6) {
-                // Nombre de la zona
-                Text(zone.name)
-                    .font(CaleiTypography.h4)
-                    .foregroundColor(CaleiColors.dark)
-                
-                // ID
-                Text("ID: \(zone.id)")
-                    .font(CaleiTypography.caption)
-                    .foregroundColor(CaleiColors.gray500)
-                
-                // Puntos de perímetro
-                Text("Puntos de perímetro: \(zone.boundaryPointsCount)")
-                    .font(CaleiTypography.caption)
-                    .foregroundColor(CaleiColors.gray500)
-                
-                // Puntos de venta
-                Text("Puntos de venta: \(salePointsCount)")
-                    .font(CaleiTypography.caption)
-                    .foregroundColor(CaleiColors.gray500)
+        VStack(spacing: 8) {
+            HStack(alignment: .center, spacing: 12) {
+                // Left: zone name
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(zone.name)
+                        .font(CaleiTypography.h4)
+                        .foregroundColor(CaleiColors.dark)
+                }
+
+                Spacer()
+
+                // Assign button
+                Button {
+                    onAssign()
+                } label: {
+                    Text("Asignar")
+                        .font(CaleiTypography.buttonSmall)
+                        .foregroundColor(CaleiColors.accent)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(CaleiColors.accent, lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.borderless)
+
+                // Chevron to expand details
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        isExpanded.toggle()
+                    }
+                } label: {
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.right")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(CaleiColors.gray400)
+                        .padding(8)
+                }
+                .buttonStyle(.borderless)
             }
-            
-            Spacer()
-            
-            // Acciones (derecha)
-            VStack(alignment: .trailing, spacing: 12) {
-                // Botones de editar y eliminar
-                HStack(spacing: 16) {
-                    // Editar
-                    Button {
-                        onEdit()
-                        } label: {
-                            Image(systemName: "pencil")
-                                .font(.system(size: 18))
+            .contentShape(Rectangle())
+            .onTapGesture {
+                // tapping the row header (outside buttons) navigates to detail
+                onTap?()
+            }
+
+            if isExpanded {
+                VStack(spacing: 8) {
+                    Divider()
+
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Puntos de perímetro: \(zone.boundaryPointsCount)")
+                                .font(CaleiTypography.caption)
+                                .foregroundColor(CaleiColors.gray500)
+
+                            Text("Puntos de venta: \(salePointsCount)")
+                                .font(CaleiTypography.caption)
                                 .foregroundColor(CaleiColors.gray500)
                         }
-                        
-                        // Eliminar
-                        Button {
-                            onDelete()
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.system(size: 18))
-                                .foregroundColor(CaleiColors.error)
+
+                        Spacer()
+
+                        // Edit / Delete inline (side-by-side)
+                        HStack(spacing: 12) {
+                            Button {
+                                onEdit()
+                            } label: {
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(CaleiColors.gray500)
+                                    .padding(8)
+                            }
+                            .buttonStyle(.borderless)
+
+                            Button {
+                                onDelete()
+                            } label: {
+                                Image(systemName: "trash")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(CaleiColors.error)
+                                    .padding(8)
+                            }
+                            .buttonStyle(.borderless)
                         }
                     }
-                    
-                    Spacer()
-                    
-                    // Botón Asignar
-                    Button {
-                        onAssign()
-                    } label: {
-                        Text("Asignar")
-                            .font(CaleiTypography.buttonSmall)
-                            .foregroundColor(CaleiColors.accent)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(CaleiColors.accent, lineWidth: 1)
-                            )
-                    }
                 }
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
-            .padding(16)
-            .background(CaleiColors.cardBackground)
-            .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.05), radius: 4, y: 2)
+        }
+        .padding(16)
+        .background(CaleiColors.cardBackground)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 4, y: 2)
     }
 }
 
@@ -1285,6 +1386,7 @@ struct StatMiniCard: View {
 struct ZonesMapView: UIViewRepresentable {
     let zones: [GeoZone]
     let salePoints: [MarkedSalePoint]
+    var selectedZoneId: Int?
     let onZoneTap: (GeoZone) -> Void
     var onSalePointTap: ((MarkedSalePoint) -> Void)?
     var onZoneLongPress: ((GeoZone) -> Void)?  // Nuevo: long press para asignar
@@ -1309,19 +1411,26 @@ struct ZonesMapView: UIViewRepresentable {
     }
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        // Calcular hash para detectar cambios reales
-        let zonesHash = zones.map { $0.id }.hashValue
-        let pointsHash = salePoints.map { $0.id }.hashValue
+        // Keep coordinator in sync with the latest SwiftUI state
+        context.coordinator.parent = self
+
+        // Deterministic signatures to detect add/edit/delete changes reliably
+        let zonesSignature = zones
+            .map { "\($0.id)-\($0.updatedAt ?? "")-\($0.boundaryPointsCount)" }
+            .joined(separator: "|")
+        let pointsSignature = salePoints
+            .map { "\($0.id)-\($0.latitude)-\($0.longitude)" }
+            .joined(separator: "|")
         
         // Solo actualizar si hay cambios
-        let needsUpdate = zonesHash != context.coordinator.lastZonesHash || 
-                          pointsHash != context.coordinator.lastPointsHash ||
+        let needsUpdate = zonesSignature != context.coordinator.lastZonesSignature || 
+                          pointsSignature != context.coordinator.lastPointsSignature ||
                           context.coordinator.isFirstLoad
         
         guard needsUpdate else { return }
         
-        context.coordinator.lastZonesHash = zonesHash
-        context.coordinator.lastPointsHash = pointsHash
+        context.coordinator.lastZonesSignature = zonesSignature
+        context.coordinator.lastPointsSignature = pointsSignature
         context.coordinator.isFirstLoad = false
         
         // Actualizar overlays de zonas de forma eficiente
@@ -1335,6 +1444,28 @@ struct ZonesMapView: UIViewRepresentable {
             fitMapToContent(mapView: mapView)
             context.coordinator.shouldFitRegion = false
         }
+
+        // Focus map on selected zone when it changes
+        if let selectedZoneId,
+           context.coordinator.lastFocusedZoneId != selectedZoneId,
+           let selectedZone = zones.first(where: { $0.id == selectedZoneId }) {
+            fitMapToZone(mapView: mapView, zone: selectedZone)
+            context.coordinator.lastFocusedZoneId = selectedZoneId
+        }
+    }
+
+    private func fitMapToZone(mapView: MKMapView, zone: GeoZone) {
+        let coords = zone.polygonCoordinates
+        guard !coords.isEmpty else { return }
+
+        let rect = coords.reduce(MKMapRect.null) { rect, coord in
+            let point = MKMapPoint(coord)
+            let pointRect = MKMapRect(x: point.x, y: point.y, width: 0.1, height: 0.1)
+            return rect.union(pointRect)
+        }
+
+        let padding = UIEdgeInsets(top: 70, left: 50, bottom: 140, right: 50)
+        mapView.setVisibleMapRect(rect, edgePadding: padding, animated: true)
     }
     
     private func updateZoneOverlays(mapView: MKMapView, context: Context) {
@@ -1402,10 +1533,11 @@ struct ZonesMapView: UIViewRepresentable {
     
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: ZonesMapView
-        var lastZonesHash: Int = 0
-        var lastPointsHash: Int = 0
+        var lastZonesSignature: String = ""
+        var lastPointsSignature: String = ""
         var isFirstLoad: Bool = true
         var shouldFitRegion: Bool = true
+        var lastFocusedZoneId: Int? = nil
         var regionChangeDebounceTask: Task<Void, Never>?
         
         init(_ parent: ZonesMapView) {
@@ -1586,6 +1718,11 @@ struct ZonesMapView: UIViewRepresentable {
             // Haptic feedback al seleccionar
             let generator = UISelectionFeedbackGenerator()
             generator.selectionChanged()
+
+            // Selecting a zone annotation focuses that zone flow in parent
+            if let zoneAnnotation = annotation as? ZoneAnnotation {
+                parent.onZoneTap(zoneAnnotation.zone)
+            }
         }
     }
 }

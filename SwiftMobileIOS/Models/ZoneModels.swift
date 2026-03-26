@@ -30,10 +30,12 @@ struct GeoZone: Codable, Identifiable, Equatable, Hashable {
     
     enum CodingKeys: String, CodingKey {
         case id, name, description, color, boundaryPoints, salePoints
-        case isDangerous, is_dangerous
-        case isActive, is_active
-        case createdAt, created_at
-        case updatedAt, updated_at
+        case isDangerous = "is_dangerous"
+        case isDangerousCamel = "isDangerous"
+        case flags
+        case isActive = "is_active"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
         case _count
     }
     
@@ -48,33 +50,29 @@ struct GeoZone: Codable, Identifiable, Equatable, Hashable {
         salePoints = try container.decodeIfPresent([ZoneSalePoint].self, forKey: .salePoints)
         _count = try container.decodeIfPresent(ZoneCountFields.self, forKey: ._count)
         
-        // isDangerous: probar ambos formatos
-        if let dangerous = try? container.decodeIfPresent(Bool.self, forKey: .isDangerous) {
-            isDangerous = dangerous
+        // isDangerous: try camelCase 'isDangerous', then snake_case 'is_dangerous', then nested flags.dangerous
+        if container.contains(.isDangerousCamel) {
+            isDangerous = try container.decodeIfPresent(Bool.self, forKey: .isDangerousCamel)
+        } else if container.contains(.isDangerous) {
+            isDangerous = try container.decodeIfPresent(Bool.self, forKey: .isDangerous)
+        } else if container.contains(.flags) {
+            if let flagsObj = try container.decodeIfPresent(ZoneFlags.self, forKey: .flags) {
+                isDangerous = flagsObj.dangerous
+            } else {
+                isDangerous = nil
+            }
         } else {
-            isDangerous = try container.decodeIfPresent(Bool.self, forKey: .is_dangerous)
+            isDangerous = nil
         }
-        
-        // isActive: probar ambos formatos
-        if let active = try? container.decodeIfPresent(Bool.self, forKey: .isActive) {
-            isActive = active
-        } else {
-            isActive = try container.decodeIfPresent(Bool.self, forKey: .is_active)
-        }
-        
-        // createdAt: probar ambos formatos
-        if let created = try? container.decodeIfPresent(String.self, forKey: .createdAt) {
-            createdAt = created
-        } else {
-            createdAt = try container.decodeIfPresent(String.self, forKey: .created_at)
-        }
-        
-        // updatedAt: probar ambos formatos
-        if let updated = try? container.decodeIfPresent(String.self, forKey: .updatedAt) {
-            updatedAt = updated
-        } else {
-            updatedAt = try container.decodeIfPresent(String.self, forKey: .updated_at)
-        }
+
+        // isActive
+        isActive = try container.decodeIfPresent(Bool.self, forKey: .isActive)
+
+        // createdAt
+        createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt)
+
+        // updatedAt
+        updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -150,9 +148,32 @@ struct GeoZone: Codable, Identifiable, Equatable, Hashable {
     /// Coordenadas del perímetro para dibujar en mapa
     var polygonCoordinates: [CLLocationCoordinate2D] {
         guard let points = boundaryPoints else { return [] }
-        return points
-            .sorted { ($0.order ?? 0) < ($1.order ?? 0) }
-            .compactMap { $0.coordinate }
+        let coords: [CLLocationCoordinate2D]
+        let hasOrder = points.contains { $0.order != nil }
+        if hasOrder {
+            // Server provided explicit draw-order — use it directly
+            coords = points
+                .sorted { ($0.order ?? Int.max) < ($1.order ?? Int.max) }
+                .compactMap { $0.coordinate }
+        } else {
+            // No order field: sort by polar angle from centroid so the polygon
+            // is always drawn without self-intersecting lines.
+            let raw = points.compactMap { $0.coordinate }
+            coords = GeoZone.sortedByAngle(raw)
+        }
+        return coords
+    }
+
+    /// Sorts an array of coordinates by polar angle from their centroid (counter-clockwise).
+    /// This produces a non-self-intersecting (convex) polygon for any point set.
+    private static func sortedByAngle(_ coords: [CLLocationCoordinate2D]) -> [CLLocationCoordinate2D] {
+        guard coords.count >= 3 else { return coords }
+        let cx = coords.reduce(0.0) { $0 + $1.latitude  } / Double(coords.count)
+        let cy = coords.reduce(0.0) { $0 + $1.longitude } / Double(coords.count)
+        return coords.sorted {
+            atan2($0.latitude - cx, $0.longitude - cy) <
+            atan2($1.latitude - cx, $1.longitude - cy)
+        }
     }
     
     /// Centro aproximado de la zona (centroide)
@@ -321,6 +342,17 @@ struct ZoneAssignment: Codable, Identifiable, Equatable, Hashable {
         let number: Int?
         let name: String?
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case zoneId = "zone_id"
+        case userId = "user_id"
+        case assignedAt = "assigned_at"
+        case assignedBy = "assigned_by"
+        case isActive = "is_active"
+        case user
+        case zone
+    }
     
     static func == (lhs: ZoneAssignment, rhs: ZoneAssignment) -> Bool {
         lhs.id == rhs.id
@@ -387,43 +419,81 @@ struct AssignableUser: Codable, Identifiable, Equatable, Hashable {
 }
 
 // MARK: - Request DTOs
-
 /// DTO para crear una zona
 struct CreateZoneRequest: Codable {
     let name: String
-    let isDangerous: Bool?
+    let code: String?
+    let zoneType: String?
+    let isActive: Bool?
+    let color: String?
+    let meta: [String: String]? // libre, usar solo pares simples en cliente
     let boundaryPoints: [BoundaryPointInput]?
-    
+    let isDangerous: Bool?
+
     struct BoundaryPointInput: Codable {
-        let latitude: Double
-        let longitude: Double
-        let order: Int
+        let lat: Double
+        let lng: Double
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case name
-        case isDangerous = "is_dangerous"
-        case boundaryPoints
+        case code
+        case zoneType = "zone_type"
+        case isActive = "is_active"
+        case color
+        case meta
+        case boundaryPoints = "boundaryPoints"
+        case isDangerous = "isDangerous"
+    }
+
+    // Backwards-compatible initializer used by existing service calls
+    init(name: String, boundaryPoints: [BoundaryPointInput]? = nil, isDangerous: Bool? = nil, code: String? = nil, zoneType: String? = nil, isActive: Bool? = nil, color: String? = nil, meta: [String: String]? = nil) {
+        self.name = name
+        self.code = code
+        self.zoneType = zoneType
+        self.isActive = isActive
+        self.color = color
+        self.meta = meta
+        self.boundaryPoints = boundaryPoints
+        self.isDangerous = isDangerous
     }
 }
 
 /// DTO para actualizar una zona
+struct ZoneFlags: Codable {
+    let dangerous: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case dangerous
+    }
+
+    init(dangerous: Bool? = nil) {
+        self.dangerous = dangerous
+    }
+}
+
 struct UpdateZoneRequest: Codable {
     let name: String?
     let isDangerous: Bool?
     let isActive: Bool?
-    
+
     enum CodingKeys: String, CodingKey {
         case name
-        case isDangerous = "is_dangerous"
+        case isDangerous = "isDangerous"
         case isActive = "is_active"
+    }
+
+    init(name: String? = nil, isDangerous: Bool? = nil, isActive: Bool? = nil) {
+        self.name = name
+        self.isDangerous = isDangerous
+        self.isActive = isActive
     }
 }
 
 /// DTO para agregar puntos al perímetro
 struct AddBoundaryPointsRequest: Codable {
     let points: [BoundaryPointInput]
-    
+
     struct BoundaryPointInput: Codable {
         let latitude: Double
         let longitude: Double
@@ -437,7 +507,7 @@ struct ZoneAreaSearchRequest: Codable {
     let latitude: Double?
     let longitude: Double?
     let radius: Double? // en metros
-    
+
     // Búsqueda por bounding box
     let minLat: Double?
     let maxLat: Double?
@@ -454,7 +524,7 @@ struct CreateZoneAssignmentRequest: Codable {
 struct ZoneAssignmentRequest: Codable {
     let zoneId: Int
     let userId: Int
-    
+
     enum CodingKeys: String, CodingKey {
         case zoneId = "zone_id"
         case userId = "user_id"
@@ -467,7 +537,7 @@ struct ZoneAssignmentResponse: Codable {
     let zoneId: Int?
     let userId: Int?
     let assignedAt: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case zoneId = "zone_id"
@@ -480,7 +550,7 @@ struct ZoneAssignmentResponse: Codable {
 struct RemoveAssignmentResponse: Codable {
     let message: String?
     let removedAssignment: RemovedAssignmentInfo?
-    
+
     struct RemovedAssignmentInfo: Codable {
         let id: Int?
         let userId: Int?
@@ -499,7 +569,7 @@ struct ZonesListResponse: Codable {
     let total: Int?
     let page: Int?
     let limit: Int?
-    
+
     var items: [GeoZone] {
         zones ?? data ?? []
     }
@@ -509,8 +579,19 @@ struct ZonesListResponse: Codable {
 struct ZoneResponse: Codable {
     let zone: GeoZone?
     let data: GeoZone?
-    
+
     var item: GeoZone? {
         zone ?? data
     }
+}
+
+// MARK: - Generic API Error Response
+struct APIFieldError: Codable {
+    let field: String?
+    let message: String?
+}
+
+struct APIErrorResponse: Codable {
+    let errors: [APIFieldError]?
+    let message: String?
 }

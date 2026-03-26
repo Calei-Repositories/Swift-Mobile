@@ -192,7 +192,7 @@ struct RegisterView: View {
                     .font(.footnote)
                 }
                 .padding(24)
-                .background(Color.white)
+                .background(CaleiColors.cardBackground)
                 .cornerRadius(24)
                 .padding(.horizontal, 20)
 

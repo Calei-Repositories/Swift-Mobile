@@ -28,13 +28,7 @@
 	<string>Necesitamos acceso continuo a tu ubicación para grabar recorridos en segundo plano.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Necesitamos acceder a tu ubicación para grabar recorridos y marcar puntos de venta.</string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Saira-Regular.ttf</string>
-		<string>Saira-Medium.ttf</string>
-		<string>Saira-SemiBold.ttf</string>
-		<string>Saira-Bold.ttf</string>
-	</array>
+
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
